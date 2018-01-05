@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Prueba aJAX</title>
+</head>
+<body>
+	
+	<form id="login">
+		<input type="email" name="email" placeholder="email">
+		<input type="password" name="password" placeholder="password">
+		<button type="submit">Enviar</button>
+	</form>
+	<hr>
+	<form id="post">
+		<input type="text" name="post[title]" placeholder="Titulo">
+		<input type="textarea" name="post[body]" placeholder="Cuerpo de Mensaje">
+		<button type="submit">Enviar</button>
+	</form>
+	<hr>
+		<button id="cerrar">Cerrar Sesión</button>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous">
+  </script>
+
+  <script>
+
+
+  	
+  	  $(document).ready(function () {
+
+  	  	if (localStorage.getItem('token') != "") {
+	  	  	$.ajax({
+	           type: "GET",
+	           url: "http://localhost:3000/api/v1/posts",
+	           headers: {
+				"Authorization": "Bearer " + localStorage.getItem('token')
+					},
+	           success: function(data)
+	           {
+	               console.log(data);
+	           }
+	         });
+  	  	}
+
+	  	
+	  	$("#login").submit(function(e) {
+
+		    var url = "http://localhost:3000/api/v1/sessions";
+
+		    $.ajax({
+		           type: "POST",
+		           url: url,
+		           data: $("#login").serialize(), 
+		           success: function(data)
+		           {
+		               console.log(data.authentication_token); 
+		               localStorage.setItem('token', data.authentication_token)
+		           }
+		         });
+
+		    	e.preventDefault(); 
+		});
+
+		$("#post").submit(function(e) {
+
+		    var url = "http://localhost:3000/api/v1/posts";
+
+		    $.ajax({
+		           type: "POST",
+		           url: url,
+		           data: $("#post").serialize(),
+		           headers: {
+    				"Authorization": "Bearer " + localStorage.getItem('token')
+  					},
+		           success: function(data)
+		           {
+		               console.log(data); 
+		           }
+		         });
+
+		    	e.preventDefault(); 
+		});
+
+		$('#cerrar').on('click', function (e) {
+			console.log("hola");
+		    	localStorage.setItem('token','');
+		    	e.preventDefault(); 
+		});
+
+
+	  
+	  });
+
+  </script>
+
+
+</body>
+</html>
